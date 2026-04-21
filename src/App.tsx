@@ -74,6 +74,8 @@ function App() {
         monthlyNetIncome: form.monthlyNetIncomeEnabled ? form.monthlyNetIncome : undefined,
         monthlyNonHousingCosts: form.monthlyNonHousingCosts,
         investmentReturnAnnualPct: form.investmentReturnAnnualPct,
+        salaryGrowthAnnualPct: form.salaryGrowthAnnualPct,
+        inflationAnnualPct: form.inflationAnnualPct,
         buyAfterYears: form.buyAfterYears,
         livingRent: {
           monthlyRent: form.livingRentMonthly,
@@ -848,6 +850,20 @@ function MoneyStep(props: {
         value={form.investmentReturnAnnualPct}
         step={0.1}
         onChange={(value) => setForm((previous) => ({ ...previous, investmentReturnAnnualPct: value }))}
+      />
+      <NumberField
+        label={copy.fields.salaryGrowth}
+        hint={copy.fields.salaryGrowthHint}
+        value={form.salaryGrowthAnnualPct}
+        step={0.1}
+        onChange={(value) => setForm((previous) => ({ ...previous, salaryGrowthAnnualPct: value }))}
+      />
+      <NumberField
+        label={copy.fields.inflation}
+        hint={copy.fields.inflationHint}
+        value={form.inflationAnnualPct}
+        step={0.1}
+        onChange={(value) => setForm((previous) => ({ ...previous, inflationAnnualPct: value }))}
       />
     </div>
   )

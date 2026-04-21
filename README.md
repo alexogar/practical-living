@@ -5,9 +5,9 @@ Frontend-only calculator that compares four strategies over a chosen horizon:
 1. Rent + invest
 2. Buy to live (annuity mortgage) + invest the monthly difference vs renting
 3. Rent for a while, then buy if accumulated cash is sufficient
-4. Rent to live + buy a smaller flat to rent out (buy-to-let), invest rental cashflow
+4. Rent to live + buy a smaller investment flat right now to rent out, invest rental cashflow
 
-The UI uses a wizard-style flow for the main questions and keeps a full advanced editor underneath. All assumptions remain editable: income, optional monthly net-income override, non-housing costs, household-based living-cost estimates, rent, prices, growth rates, purchase costs, mortgage terms, special repayments, aggressive payoff toggles, vacancy, and a simplified Berlin/Germany rental-tax model.
+The UI uses a wizard-style flow for the main questions and keeps a full advanced editor underneath. All assumptions remain editable: income, optional monthly net-income override, salary growth, inflation for recurring costs, non-housing costs, household-based living-cost estimates, rent, prices, growth rates, purchase costs, mortgage terms, special repayments, aggressive payoff toggles, vacancy, and a simplified Berlin/Germany rental-tax model.
 
 ## Run locally
 
@@ -26,6 +26,8 @@ The UI uses a wizard-style flow for the main questions and keeps a full advanced
 ## Notes
 
 - Monthly investable cash is derived from yearly net income by default, but you can optionally override it with a direct monthly net-income figure before subtracting non-housing costs and housing costs.
+- Salary growth and inflation are now modeled explicitly. Salary growth increases the active monthly net income over time, while inflation grows recurring non-housing and owner costs.
+- Default assumptions were adjusted to a 2% deposit/investment return and 1% default property and rent growth.
 - Step 1 now includes a household questionnaire that estimates monthly non-housing costs from adults, children, lifestyle, transport, insurance, vacations, dining, and childcare.
 - Monthly payment summaries are shown for every strategy, including scheduled mortgage payments and any extra repayment currently being applied.
 - Buy-to-let includes a simplified Berlin/Germany rental tax model based on marginal tax, solidarity surcharge, church tax, interest deductibility, and depreciation.

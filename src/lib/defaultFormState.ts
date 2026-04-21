@@ -15,6 +15,8 @@ export type FormState = {
   householdVacationYearly: number
   householdChildcareMonthly: number
   investmentReturnAnnualPct: number
+  salaryGrowthAnnualPct: number
+  inflationAnnualPct: number
   buyAfterYears: number
 
   livingRentMonthly: number
@@ -78,11 +80,13 @@ export const defaultFormState: FormState = {
   householdDiningMonthly: 160,
   householdVacationYearly: 2_400,
   householdChildcareMonthly: 0,
-  investmentReturnAnnualPct: 5,
+  investmentReturnAnnualPct: 2,
+  salaryGrowthAnnualPct: 2,
+  inflationAnnualPct: 2,
   buyAfterYears: 2,
 
   livingRentMonthly: 1_800,
-  livingRentGrowthAnnualPct: 2,
+  livingRentGrowthAnnualPct: 1,
 
   homePrice: 500_000,
   homeDownPaymentPct: 20,
@@ -90,7 +94,7 @@ export const defaultFormState: FormState = {
   homeTermYears: 30,
   homeSpecialRepaymentAnnualPct: 0,
   homeUseSurplusForPrepayment: false,
-  homeGrowthAnnualPct: 2,
+  homeGrowthAnnualPct: 1,
   homeMaintenanceAnnualPct: 1,
   homeFixedMonthlyCosts: 0,
   // Berlin/DE-ish defaults, editable.
@@ -107,7 +111,7 @@ export const defaultFormState: FormState = {
   rentalTermYears: 30,
   rentalSpecialRepaymentAnnualPct: 0,
   rentalUseSurplusForPrepayment: false,
-  rentalGrowthAnnualPct: 2,
+  rentalGrowthAnnualPct: 1,
   rentalMaintenanceAnnualPct: 1,
   rentalFixedMonthlyCosts: 0,
   rentalTransferTaxPct: 6,
@@ -116,7 +120,7 @@ export const defaultFormState: FormState = {
   rentalOtherFixed: 0,
 
   rentalColdRentMonthly: 900,
-  rentalRentGrowthAnnualPct: 2,
+  rentalRentGrowthAnnualPct: 1,
   rentalVacancyPct: 3,
   rentalNonRecoverableMonthlyCosts: 150,
   rentalManagementFeePct: 0,

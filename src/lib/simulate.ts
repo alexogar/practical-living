@@ -57,6 +57,8 @@ export type Inputs = {
   monthlyNetIncome?: number
   monthlyNonHousingCosts: number
   investmentReturnAnnualPct: number
+  salaryGrowthAnnualPct: number
+  inflationAnnualPct: number
   buyAfterYears: number
   livingRent: Rent
   buyToLive: Property
@@ -276,6 +278,11 @@ function rentalColdRentAtMonth(rental: RentalIncome, monthIndex: number): number
   return clampNumber(rental.monthlyColdRent) * Math.pow(1 + monthlyGrowth, monthIndex)
 }
 
+function valueAtMonth(amount: number, annualPct: number, monthIndex: number): number {
+  const monthlyGrowth = monthlyRateFromAnnualPct(annualPct)
+  return clampNumber(amount) * Math.pow(1 + monthlyGrowth, monthIndex)
+}
+
 function effectiveRentalTaxRate(taxes: BuyToLetTaxes): number {
   const incomeTax = clampNumber(taxes.marginalIncomeTaxPct) / 100
   const solidarity = clampNumber(taxes.solidarityPctOnIncomeTax) / 100
@@ -283,12 +290,22 @@ function effectiveRentalTaxRate(taxes: BuyToLetTaxes): number {
   return incomeTax * (1 + solidarity + church)
 }
 
-function monthlyDisposableBeforeHousing(inputs: Inputs): number {
-  const monthlyNetIncome =
-    typeof inputs.monthlyNetIncome === 'number'
-      ? clampNumber(inputs.monthlyNetIncome)
-      : clampNumber(inputs.annualNetIncome) / 12
-  return monthlyNetIncome - clampNumber(inputs.monthlyNonHousingCosts)
+function baseMonthlyNetIncome(inputs: Inputs): number {
+  return typeof inputs.monthlyNetIncome === 'number'
+    ? clampNumber(inputs.monthlyNetIncome)
+    : clampNumber(inputs.annualNetIncome) / 12
+}
+
+function monthlyNetIncomeAtMonth(inputs: Inputs, monthIndex: number): number {
+  return valueAtMonth(baseMonthlyNetIncome(inputs), inputs.salaryGrowthAnnualPct, monthIndex)
+}
+
+function monthlyNonHousingCostsAtMonth(inputs: Inputs, monthIndex: number): number {
+  return valueAtMonth(inputs.monthlyNonHousingCosts, inputs.inflationAnnualPct, monthIndex)
+}
+
+function monthlyDisposableBeforeHousing(inputs: Inputs, monthIndex: number): number {
+  return monthlyNetIncomeAtMonth(inputs, monthIndex) - monthlyNonHousingCostsAtMonth(inputs, monthIndex)
 }
 
 export function simulate(rawInputs: Inputs): SimulationResult {
@@ -301,7 +318,7 @@ export function simulate(rawInputs: Inputs): SimulationResult {
   const months = Math.round(inputs.horizonYears * 12)
   const buyAfterMonths = Math.round(inputs.buyAfterYears * 12)
   const investMonthlyRate = monthlyRateFromAnnualPct(inputs.investmentReturnAnnualPct)
-  const disposableBeforeHousing = monthlyDisposableBeforeHousing(inputs)
+  const disposableBeforeHousing = monthlyDisposableBeforeHousing(inputs, 0)
   const rentalTaxRate = effectiveRentalTaxRate(inputs.buyToLetTaxes)
 
   const warningsRent: string[] = []
@@ -410,6 +427,7 @@ export function simulate(rawInputs: Inputs): SimulationResult {
     delayedHomeMortgage = resetAnnualSpecialRepaymentCounterIfNeeded(delayedHomeMortgage, monthIndex)
     rentalMortgage = resetAnnualSpecialRepaymentCounterIfNeeded(rentalMortgage, monthIndex)
 
+    const disposableBeforeHousingAtMonth = monthlyDisposableBeforeHousing(inputs, monthIndex)
     const livingRent = rentAtMonth(inputs.livingRent, monthIndex)
     const homeValue = propertyValueAtMonth(inputs.buyToLive.price, inputs.buyToLive.growthAnnualPct, monthIndex)
     const rentalValue = propertyValueAtMonth(
@@ -417,12 +435,27 @@ export function simulate(rawInputs: Inputs): SimulationResult {
       inputs.buyToLetProperty.growthAnnualPct,
       monthIndex,
     )
+    const buyLiveFixedMonthlyCosts = valueAtMonth(
+      inputs.buyToLive.fixedMonthlyCosts,
+      inputs.inflationAnnualPct,
+      monthIndex,
+    )
+    const rentalFixedMonthlyCosts = valueAtMonth(
+      inputs.buyToLetProperty.fixedMonthlyCosts,
+      inputs.inflationAnnualPct,
+      monthIndex,
+    )
+    const rentalNonRecoverableMonthlyCosts = valueAtMonth(
+      inputs.buyToLetRentalIncome.nonRecoverableMonthlyCosts,
+      inputs.inflationAnnualPct,
+      monthIndex,
+    )
 
     const buyLiveOwnerCosts =
       (clampNumber(inputs.buyToLive.maintenanceAnnualPct) / 100) * (homeValue / 12) +
-      clampNumber(inputs.buyToLive.fixedMonthlyCosts)
+      buyLiveFixedMonthlyCosts
     const buyLiveBasePayment = homeMortgage.monthlyPayment + buyLiveOwnerCosts
-    const buyLiveRawContribution = disposableBeforeHousing - buyLiveBasePayment
+    const buyLiveRawContribution = disposableBeforeHousingAtMonth - buyLiveBasePayment
     let buyLiveExtraRepayment = 0
     if (inputs.buyToLive.mortgage.useSurplusForPrepayment && buyLiveRawContribution > 0) {
       const extra = applyExtraRepayment(homeMortgage, buyLiveRawContribution, false)
@@ -433,11 +466,11 @@ export function simulate(rawInputs: Inputs): SimulationResult {
 
     const delayedOwnerCosts =
       (clampNumber(inputs.buyToLive.maintenanceAnnualPct) / 100) * (homeValue / 12) +
-      clampNumber(inputs.buyToLive.fixedMonthlyCosts)
+      buyLiveFixedMonthlyCosts
     const delayedBasePayment = delayedHomeMortgage.monthlyPayment + delayedOwnerCosts
     const delayedRawContribution = rentThenBuyPurchased
-      ? disposableBeforeHousing - delayedBasePayment
-      : disposableBeforeHousing - livingRent
+      ? disposableBeforeHousingAtMonth - delayedBasePayment
+      : disposableBeforeHousingAtMonth - livingRent
     let delayedExtraRepayment = 0
     if (
       rentThenBuyPurchased &&
@@ -456,8 +489,8 @@ export function simulate(rawInputs: Inputs): SimulationResult {
       (clampNumber(inputs.buyToLetRentalIncome.managementFeePct) / 100) * rentalEffective
     const rentalOwnerCosts =
       (clampNumber(inputs.buyToLetProperty.maintenanceAnnualPct) / 100) * (rentalValue / 12) +
-      clampNumber(inputs.buyToLetProperty.fixedMonthlyCosts) +
-      clampNumber(inputs.buyToLetRentalIncome.nonRecoverableMonthlyCosts) +
+      rentalFixedMonthlyCosts +
+      rentalNonRecoverableMonthlyCosts +
       rentalManagementFee
     const rentalAmortization = amortizeOneMonth(rentalMortgage)
     const monthlyDepreciation =
@@ -471,7 +504,7 @@ export function simulate(rawInputs: Inputs): SimulationResult {
     const rentalNetCashflow =
       rentalEffective - (rentalMortgage.monthlyPayment + rentalOwnerCosts) - rentalTaxes
 
-    const rentContribution = disposableBeforeHousing - livingRent
+    const rentContribution = disposableBeforeHousingAtMonth - livingRent
     const buyLetRawContribution = rentContribution + rentalNetCashflow
     let buyLetExtraRepayment = 0
     if (inputs.buyToLetProperty.mortgage.useSurplusForPrepayment && buyLetRawContribution > 0) {

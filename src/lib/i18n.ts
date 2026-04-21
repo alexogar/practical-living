@@ -104,6 +104,10 @@ export type Translation = {
     monthlyNonHousingCostsHint: string
     initialCash: string
     investmentReturn: string
+    salaryGrowth: string
+    salaryGrowthHint: string
+    inflation: string
+    inflationHint: string
     expectedRent: string
     rentGrowth: string
     buyAfterYears: string
@@ -204,9 +208,9 @@ export const translations: Record<Locale, Translation> = {
     languages: { en: 'English', de: 'Deutsch' },
     header: {
       eyebrow: 'Practical living calculator',
-      title: 'Rent, buy now, buy later, or buy-to-let first',
+      title: 'Rent, buy now, buy later, or buy an investment flat now',
       intro:
-        'Start simple, then go deeper only if needed. The calculator uses your income, living costs, rent, mortgage settings, and optional buy-to-let taxes to estimate what happens to your monthly surplus and your balance sheet over time.',
+        'Start simple, then go deeper only if needed. The calculator uses your income, salary growth, inflation, living costs, rent, mortgage settings, and optional buy-to-let taxes to estimate what happens to your monthly surplus and your balance sheet over time.',
     },
     summary: {
       planningLabel: 'Current snapshot',
@@ -239,7 +243,7 @@ export const translations: Record<Locale, Translation> = {
       steps: [
         { title: '1. Income and buffer', prompt: 'Start with income, cash, household profile, and non-housing living costs.' },
         { title: '2. Living and buying', prompt: 'Set rent today and the home you could buy for yourself.' },
-        { title: '3. Optional buy-to-let', prompt: 'Only fill this in if you want to test buying a smaller flat for renting out.' },
+        { title: '3. Optional investment flat', prompt: 'Only fill this in if you want to test buying a smaller flat right now and renting it out.' },
       ],
     },
     quickActions: {
@@ -299,6 +303,10 @@ export const translations: Record<Locale, Translation> = {
       monthlyNonHousingCostsHint: 'Food, transport, insurance, travel, childcare, subscriptions, and everything else besides rent or mortgage.',
       initialCash: 'Current liquid cash / net worth',
       investmentReturn: 'Investment return (annual %)',
+      salaryGrowth: 'Salary growth (annual %)',
+      salaryGrowthHint: 'Applied to your active monthly net income over time.',
+      inflation: 'Inflation for recurring costs (annual %)',
+      inflationHint: 'Used to grow non-housing costs and recurring owner costs over time.',
       expectedRent: 'Monthly expected rent',
       rentGrowth: 'Rent growth (annual %)',
       buyAfterYears: 'Buy after renting for (years)',
@@ -394,7 +402,7 @@ export const translations: Record<Locale, Translation> = {
       rentInvest: 'Rent + invest',
       buyToLive: 'Buy now',
       rentThenBuy: 'Rent then buy',
-      rentPlusBuyToLet: 'Rent + buy-to-let',
+      rentPlusBuyToLet: 'Rent + buy investment flat now',
     },
   },
   de: {
@@ -402,8 +410,8 @@ export const translations: Record<Locale, Translation> = {
     languages: { en: 'English', de: 'Deutsch' },
     header: {
       eyebrow: 'Praktischer Wohnrechner',
-      title: 'Mieten, sofort kaufen, später kaufen oder zuerst Buy-to-let',
-      intro: 'Starte einfach und gehe nur bei Bedarf tiefer. Der Rechner nutzt dein Einkommen, deine Lebenshaltungskosten, Miete, Hypothekeneinstellungen und optionale Buy-to-let-Steuern, um monatlichen Überschuss und Vermögensentwicklung zu schätzen.',
+      title: 'Mieten, sofort kaufen, später kaufen oder jetzt eine Anlagewohnung kaufen',
+      intro: 'Starte einfach und gehe nur bei Bedarf tiefer. Der Rechner nutzt dein Einkommen, Einkommenswachstum, Inflation, Lebenshaltungskosten, Miete, Hypothekeneinstellungen und optionale Buy-to-let-Steuern, um monatlichen Überschuss und Vermögensentwicklung zu schätzen.',
     },
     summary: {
       planningLabel: 'Aktueller Stand',
@@ -435,7 +443,7 @@ export const translations: Record<Locale, Translation> = {
       steps: [
         { title: '1. Einkommen und Puffer', prompt: 'Beginne mit Einkommen, vorhandenem Geld, Familienprofil und sonstigen Lebenshaltungskosten.' },
         { title: '2. Wohnen und Kaufen', prompt: 'Setze heutige Miete und die Wohnung, die du selbst kaufen könntest.' },
-        { title: '3. Optionales Buy-to-let', prompt: 'Fülle das nur aus, wenn du den Kauf einer kleineren Vermietungswohnung testen willst.' },
+        { title: '3. Optionale Anlagewohnung', prompt: 'Fülle das nur aus, wenn du den Kauf einer kleineren Wohnung jetzt und deren Vermietung testen willst.' },
       ],
     },
     quickActions: {
@@ -495,6 +503,10 @@ export const translations: Record<Locale, Translation> = {
       monthlyNonHousingCostsHint: 'Essen, Transport, Versicherungen, Reisen, Kinderbetreuung, Abos und alles außer Miete oder Hypothek.',
       initialCash: 'Aktuell verfügbares Geld / Nettovermögen',
       investmentReturn: 'Anlagerendite (jährlich %)',
+      salaryGrowth: 'Einkommenswachstum (jährlich %)',
+      salaryGrowthHint: 'Wird im Zeitverlauf auf dein aktives monatliches Nettoeinkommen angewendet.',
+      inflation: 'Inflation für laufende Kosten (jährlich %)',
+      inflationHint: 'Erhöht im Modell laufende Lebenshaltungskosten und wiederkehrende Eigentümerkosten.',
       expectedRent: 'Erwartete Monatsmiete',
       rentGrowth: 'Mietwachstum (jährlich %)',
       buyAfterYears: 'Nach wie vielen Jahren Miete kaufen',
@@ -590,7 +602,7 @@ export const translations: Record<Locale, Translation> = {
       rentInvest: 'Mieten + investieren',
       buyToLive: 'Jetzt kaufen',
       rentThenBuy: 'Erst mieten, dann kaufen',
-      rentPlusBuyToLet: 'Mieten + Buy-to-let',
+      rentPlusBuyToLet: 'Mieten + jetzt Anlagewohnung kaufen',
     },
   },
 }
